@@ -36,12 +36,12 @@ def text_example(mode, image_path, save_to="./"):
 def make_generator(target_size=(224,224), batch_size=32, validation_split=0.0, class_mode="categorical", preprocessing_function=lambda x:x):
     imag_gen = ImageDataGenerator(
             preprocessing_function=preprocessing_function,
-            rotation_range=45, width_shift_range=0.2,
-            height_shift_range=0.2, brightness_range=None,
-            shear_range=0.05, zoom_range=0.1,
-            channel_shift_range=0.0, fill_mode='nearest',
-            cval=0.0, horizontal_flip=True,
-            vertical_flip=False, validation_split=validation_split)
+            rotation_range=45)#, width_shift_range=0.2,
+            #height_shift_range=0.2, brightness_range=None,
+            #shear_range=0.05, zoom_range=0.1,
+            #channel_shift_range=0.0, fill_mode='nearest',
+            #cval=0.0, horizontal_flip=True,
+            #vertical_flip=False, validation_split=validation_split)
     gen = imag_gen.flow_from_directory(
             "food-101/images/", target_size=target_size, batch_size=batch_size, class_mode=class_mode)
     return gen
@@ -291,8 +291,8 @@ def autoencoder():
 
 if __name__ == "__main__":
     batch = 64
-    shape = (200, 200)
-    pre = preproces_avs(shape=shape, batch_size=1050)
+    shape = (100, 100)
+    pre = preproces_avs(shape=shape, batch_size=2020)
     pre_for_gen = lambda x : pre.transform(x.reshape((1, shape[0]*shape[1]*3))).reshape((1,)+ shape +(3,))
     gen = make_generator(shape, batch,
             preprocessing_function=pre_for_gen)
