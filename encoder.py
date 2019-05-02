@@ -65,8 +65,8 @@ def make_vgg():
     return model
 
 
-def make_inception():
-    base_model = InceptionV3(weights='imagenet', include_top=False, input_tensor=Input(shape=(80, 80, 3)))
+def make_inception(in_shape=(299,299)):
+    base_model = InceptionV3(weights='imagenet', include_top=False, input_tensor=Input(shape=in_shape + (3,)))
     x = base_model.output
     #x = AveragePooling2D(pool_size=(8, 8))(x)
     x = Dropout(.4)(x)
@@ -290,12 +290,12 @@ def autoencoder():
     model.fit_generator(gen, steps_per_epoch=500)#101000/32)
 
 if __name__ == "__main__":
-    batch = 256
-    shape = (80, 80)
-    pre = preproces_avs(shape=shape, batch_size=10100)
-    pre_for_gen = lambda x : pre.transform(x.reshape((1, 80*80*3))).reshape((1, 80, 80, 3))
-    gen = make_generator((80,80), 256,
+    batch = 64
+    shape = (200, 200)
+    pre = preproces_avs(shape=shape, batch_size=1050)
+    pre_for_gen = lambda x : pre.transform(x.reshape((1, shape[0]*shape[1]*3))).reshape((1,)+ shape +(3,))
+    gen = make_generator(shape, batch,
             preprocessing_function=pre_for_gen)
-    model = make_inception()
+    model = make_inception(shape)
     model.fit_generator(gen, steps_per_epoch=101000/265, epochs=1,
             max_queue_size=10, workers=2, use_multiprocessing=True)
