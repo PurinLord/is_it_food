@@ -186,7 +186,6 @@ def train(generator, discriminator, imag_gen, batch_size, cycles, sub_cyc, sampl
 
         d_loss_real = discriminator.train_on_batch(imgs, real)
         d_loss_fake = discriminator.train_on_batch(gen_imgs, fake)
-        d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
 
         # ---------------------
         #  Train the Generator
@@ -195,7 +194,7 @@ def train(generator, discriminator, imag_gen, batch_size, cycles, sub_cyc, sampl
         combined.compile(loss='binary_crossentropy', optimizer=Adam())
         for gen_it in range(sub_cyc):
             z = np.random.normal(0, 1, (batch_size, 100))
-            gen_imgs = generator.predict(z)
+            #gen_imgs = generator.predict(z)
             g_loss = combined.train_on_batch(z, real)
         print ("----- [G loss: %f]" % g_loss)
         discriminator.trainable = True
@@ -204,6 +203,7 @@ def train(generator, discriminator, imag_gen, batch_size, cycles, sub_cyc, sampl
 
         if iteration % sample_interval == 0:
             # Output training progress
+            d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
             print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % 
                          (iteration, d_loss[0], 100*d_loss[1], g_loss))
 
@@ -238,4 +238,4 @@ if __name__ == "__main__":
     pre = preproces_avs(shape=shape)
     pre_for_gen = lambda x : pre.transform(x.reshape((1, shape[0]*shape[1]*3))).reshape((1,)+ shape +(3,))
     imag_gen = make_generator(target_size=(300,300), batch_size=batch_size, class_mode=None, preprocessing_function=pre_for_gen)
-    train(generator, discriminator, imag_gen, batch_size, 1000, 8, 4)
+    train(generator, discriminator, imag_gen, batch_size, 1000, 20, 5)
