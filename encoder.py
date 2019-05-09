@@ -33,6 +33,14 @@ def text_example(mode, image_path, save_to="./"):
     return pred
 
 
+def decode_image(predict, pre, shape=(300, 300), index=0):
+    decoded_img = pre.inverse_transform(
+            predict[index].reshape(
+                (1, shape[0]*shape[1]*3))).reshape(shape +(3,))
+    Image.fromarray(
+            decoded_img.astype("uint8"), "RGB").save("gen", format="jpeg")
+
+
 def make_generator(target_size=(224,224), batch_size=32, validation_split=0.0, class_mode="categorical", preprocessing_function=lambda x:x):
     imag_gen = ImageDataGenerator(
             preprocessing_function=preprocessing_function,
@@ -297,5 +305,5 @@ if __name__ == "__main__":
     gen = make_generator(shape, batch,
             preprocessing_function=pre_for_gen)
     model = make_inception(shape)
-    model.fit_generator(gen, steps_per_epoch=101000/265, epochs=1,
+    model.fit_generator(gen, steps_per_epoch=101000/batch, epochs=10,
             max_queue_size=10, workers=2, use_multiprocessing=True)
